@@ -3,10 +3,38 @@ const mongoose = require('mongoose');
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-let Person;
+require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+  console.log('addr: ' + add);
+})
+
+// Create person schema
+const personSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  age: Number,
+  favoriteFoods: [{
+    type: String
+  }]
+});
+
+let Person = mongoose.model('Person', personSchema);
 
 const createAndSavePerson = (done) => {
-  done(null /*, data*/);
+  const newPerson = new Person({
+    name: 'Henry',
+    age: 34,
+    favoriteFoods: ['pizza', 'pasta']
+  });
+  newPerson.save( (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(newPerson.name + ' is saved to the database');
+      done(null , data);
+    }
+  });
 };
 
 const createManyPeople = (arrayOfPeople, done) => {
